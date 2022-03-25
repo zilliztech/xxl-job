@@ -59,4 +59,4 @@ ENV JAVA_OPTS="\
 
 # ENTRYPOINT java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom -jar /app.jar
 
-ENTRYPOINT ["java -jar $JAVA_OPTS /app.jar $PARAMS"]
+ENTRYPOINT ["/bin/bash" "-c" "java  -jar $JAVA_OPTS /app.jar $PARAMS]
