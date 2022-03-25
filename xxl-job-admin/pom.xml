@@ -110,7 +110,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${spring-boot.version}</version>
 				<configuration>
-					<mainClass>com.xxl.job.admin.XxlJobAdminApplication}</mainClass>
+					<mainClass>com.xxl.job.admin.XxlJobAdminApplication</mainClass>
 				</configuration>
 				<executions>
 					<execution>
