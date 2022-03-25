@@ -104,10 +104,14 @@
 
 	<build>
 		<plugins>
+			<!--指定SpringBoot的启动类-->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${spring-boot.version}</version>
+				<configuration>
+					<mainClass>com.xxl.job.admin.XxlJobAdminApplication}</mainClass>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -116,24 +120,36 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- docker -->
+
+			<!--指定项目的编译Java版本，设置为1.8就好了-->
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.4.13</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.0</version>
 				<configuration>
-					<!-- made of '[a-z0-9-_.]' -->
-					<imageName>${project.artifactId}:${project.version}</imageName>
-					<dockerDirectory>${project.basedir}</dockerDirectory>
-					<resources>
-						<resource>
-							<targetPath>/</targetPath>
-							<directory>${project.build.directory}</directory>
-							<include>${project.build.finalName}.jar</include>
-						</resource>
-					</resources>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+<!--			&lt;!&ndash; docker &ndash;&gt;-->
+<!--			<plugin>-->
+<!--				<groupId>com.spotify</groupId>-->
+<!--				<artifactId>docker-maven-plugin</artifactId>-->
+<!--				<version>0.4.13</version>-->
+<!--				<configuration>-->
+<!--					&lt;!&ndash; made of '[a-z0-9-_.]' &ndash;&gt;-->
+<!--					<imageName>${project.artifactId}:${project.version}</imageName>-->
+<!--					<dockerDirectory>${project.basedir}</dockerDirectory>-->
+<!--					<resources>-->
+<!--						<resource>-->
+<!--							<targetPath>/</targetPath>-->
+<!--							<directory>${project.build.directory}</directory>-->
+<!--							<include>${project.build.finalName}.jar</include>-->
+<!--						</resource>-->
+<!--					</resources>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 
