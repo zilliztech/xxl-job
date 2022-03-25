@@ -1,5 +1,7 @@
 server:
   port: 9100
+  servlet:
+    context-path: /xxl-job-admin
 
 management:
   health:
@@ -8,10 +10,12 @@ management:
   server:
     servlet:
       context-path: /actuator
+
+
 mybatis:
   mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
-  servlet:
-    context-path: /xxl-job-admin
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
