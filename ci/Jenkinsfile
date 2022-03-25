@@ -5,6 +5,7 @@ def date=''
 def image_tag=''
 def app_name='xxj-job-admin'
 def github='https://github.com/zilliztech/xxj-job.git'
+def devops_cd_git="github.com/zilliztech/vdc-deploy.git"
 pipeline {
    options{
     disableConcurrentBuilds(abortPrevious: true)
@@ -61,31 +62,31 @@ pipeline {
             }
         }
 
-        // stage('Deploy'){
-        //     steps{
-        //         script{
-        //             withCredentials([usernamePassword(credentialsId: "${env.GITHUB_TOKEN_ID}", usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]){
-        //             sh """
-        //                 git remote set-url origin https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git}
-        //                 git config --global user.name "${GITHUB_USER}"
-        //                 git config --global user.email "test@zilliz.com"
-        //                 git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git} /opt/devops-cd
-        //                 cd /opt/devops-cd
-        //                 git pull
-        //                 cd /opt/devops-cd/${app_name}/overlays/${TEST_ENVIRONMENT}
-        //                 kustomize edit set image ${app_name}=${DOCKER_IMAGE}:${image_tag}
-        //                 git commit -am "[automated]Update ${app_name} Docker image for ${TEST_ENVIRONMENT} test environment" --allow-empty
-        //                 git push origin master
-        //             """
-        //             }
-        //             withCredentials([usernamePassword(credentialsId: "${env.ARGOCD_TOKEN_ID}", usernameVariable: 'ARGOCD_SERVER', passwordVariable: 'ARGOCD_AUTH_TOKEN')]){
-        //                 sh """
-        //                  argocd app sync sit-${app_name} --retry-limit 3 --prune --grpc-web
-        //                 """
-        //             }
+        stage('Deploy'){
+            steps{
+                script{
+                    withCredentials([usernamePassword(credentialsId: "${env.GITHUB_TOKEN_ID}", usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]){
+                    sh """
+                        git remote set-url origin https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git}
+                        git config --global user.name "${GITHUB_USER}"
+                        git config --global user.email "test@zilliz.com"
+                        git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git} /opt/devops-cd
+                        cd /opt/devops-cd
+                        git pull
+                        cd /opt/devops-cd/${app_name}/overlays/${TEST_ENVIRONMENT}
+                        kustomize edit set image ${app_name}=${DOCKER_IMAGE}:${image_tag}
+                        git commit -am "[automated]Update ${app_name} Docker image for ${TEST_ENVIRONMENT} test environment" --allow-empty
+                        git push origin master
+                    """
+                    }
+                    withCredentials([usernamePassword(credentialsId: "${env.ARGOCD_TOKEN_ID}", usernameVariable: 'ARGOCD_SERVER', passwordVariable: 'ARGOCD_AUTH_TOKEN')]){
+                        sh """
+                         argocd app sync sit-${app_name} --retry-limit 3 --prune --grpc-web
+                        """
+                    }
 
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
     }
 }
