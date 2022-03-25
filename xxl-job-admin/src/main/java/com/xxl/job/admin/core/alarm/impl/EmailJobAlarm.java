@@ -98,7 +98,6 @@ public class EmailJobAlarm implements JobAlarm {
     private static final String loadFeishuTemplate() {
 
         String message = I18nUtil.getString("jobinfo_field_jobgroup") + ": {0}" + System.lineSeparator()
-                + I18nUtil.getString("jobinfo_field_id") + ": {1}" + System.lineSeparator()
                 + I18nUtil.getString("jobinfo_field_jobdesc") + ": {2}" + System.lineSeparator()
                 + I18nUtil.getString("jobconf_monitor_alarm_title") + ": " + I18nUtil.getString("jobconf_monitor_alarm_type") + System.lineSeparator()
                 + I18nUtil.getString("jobconf_monitor_alarm_content") + ": {3}" + System.lineSeparator();

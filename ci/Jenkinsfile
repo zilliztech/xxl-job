@@ -1,0 +1,91 @@
+#!/usr/bin/env groovy
+
+def gitShortCommit=''
+def date=''
+def image_tag=''
+def app_name='xxj-job-admin'
+def github='https://github.com/zilliztech/xxj-job.git'
+pipeline {
+   options{
+    disableConcurrentBuilds(abortPrevious: true)
+
+   }
+   agent {
+        kubernetes {
+            label 'ci'
+            inheritFrom 'default'
+            defaultContainer 'main'
+            yamlFile 'ci/pod/ci.yaml'
+            customWorkspace '/home/jenkins/agent/workspace'
+        }
+   }
+   environment{
+      DOCKER_IMAGE="harbor-ap1.zilliz.cc/vdc/${app_name}"
+      GITHUB_TOKEN_ID="github-token"
+      BRANCH_NAME = "${GIT_BRANCH.contains('/') ?GIT_BRANCH.substring(GIT_BRANCH.lastIndexOf('/') + 1) : GIT_BRANCH}"
+      TEST_ENVIRONMENT="sit"
+      ARGOCD_TOKEN_ID="argocd-token"
+      GIT_REPO="${github}"
+   }
+    stages {
+        stage('Checkout'){
+            steps{
+                script {
+                    sh 'printenv'
+                    date = sh(returnStdout: true, script: 'date +%Y%m%d').trim()
+                    gitShortCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    image_tag="${BRANCH_NAME}-${date}-${gitShortCommit}"
+                    //Copy settings
+                    sh 'cp /apps/.m2/settings.xml  settings.xml'
+                }
+            }
+        }
+        stage('Build & Publish Image') {
+            steps{
+                container(name: 'kaniko',shell: '/busybox/sh') {
+                  script {
+                    sh 'ls -lah '
+                    sh """
+                    executor \
+                    --context="`pwd`" \
+                    --registry-mirror="nexus-nexus-repository-manager-docker-5000.nexus:5000"\
+                    --insecure-registry="nexus-nexus-repository-manager-docker-5000.nexus:5000" \
+                    --build-arg=GIT_REPO=${GIT_REPO} \
+                    --build-arg=GIT_BRANCH=${BRANCH_NAME} \
+                    --build-arg=GIT_COMMIT_HASH=${GIT_COMMIT} \
+                    --dockerfile "ci/docker/Dockerfile" \
+                    --destination=${DOCKER_IMAGE}:${image_tag}
+                    """
+                  }
+                }
+            }
+        }
+
+        // stage('Deploy'){
+        //     steps{
+        //         script{
+        //             withCredentials([usernamePassword(credentialsId: "${env.GITHUB_TOKEN_ID}", usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]){
+        //             sh """
+        //                 git remote set-url origin https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git}
+        //                 git config --global user.name "${GITHUB_USER}"
+        //                 git config --global user.email "test@zilliz.com"
+        //                 git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${devops_cd_git} /opt/devops-cd
+        //                 cd /opt/devops-cd
+        //                 git pull
+        //                 cd /opt/devops-cd/${app_name}/overlays/${TEST_ENVIRONMENT}
+        //                 kustomize edit set image ${app_name}=${DOCKER_IMAGE}:${image_tag}
+        //                 git commit -am "[automated]Update ${app_name} Docker image for ${TEST_ENVIRONMENT} test environment" --allow-empty
+        //                 git push origin master
+        //             """
+        //             }
+        //             withCredentials([usernamePassword(credentialsId: "${env.ARGOCD_TOKEN_ID}", usernameVariable: 'ARGOCD_SERVER', passwordVariable: 'ARGOCD_AUTH_TOKEN')]){
+        //                 sh """
+        //                  argocd app sync sit-${app_name} --retry-limit 3 --prune --grpc-web
+        //                 """
+        //             }
+
+        //         }
+        //     }
+        // }
+    }
+}
