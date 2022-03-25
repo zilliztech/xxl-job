@@ -6,7 +6,6 @@ FROM ${BUILD_IMAGE} AS builder
 
 COPY xxl-job-admin /usr/src/app/xxl-job-admin
 COPY xxl-job-core  /usr/src/app/xxl-job-core
-COPY xxl-job-executor-samples /usr/src/app/xl-job-executor-samples
 COPY  pom.xml /usr/src/app
 
 COPY settings.xml  /usr/share/maven/conf/settings.xml
@@ -33,4 +32,26 @@ ARG GIT_COMMIT_HASH=""
 LABEL GIT_COMMIT_HASH=${GIT_COMMIT_HASH} REVERSION=${REVERSION} GIT_BRANCH=${GIT_BRANCH} GIT_REPO=${GIT_REPO}
 
 RUN bash -c 'touch /app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+EXPOSE 9100
+ENV JAVA_OPTS="\
+-server \
+-Xmx4g \
+-Xms4g \
+-Xmn2g \
+-XX:SurvivorRatio=8 \
+-XX:MetaspaceSize=256m \
+-XX:MaxMetaspaceSize=512m \
+-XX:+UseParallelGC \
+-XX:ParallelGCThreads=4 \
+-XX:+UseParallelOldGC \
+-XX:+UseAdaptiveSizePolicy \
+-XX:+PrintGCDetails \
+-XX:+PrintTenuringDistribution \
+-XX:+PrintGCTimeStamps \
+-XX:+HeapDumpOnOutOfMemoryError \
+-XX:HeapDumpPath=/ \
+-Xloggc:/gc.log \
+-XX:+UseGCLogFileRotation \
+-XX:NumberOfGCLogFiles=5 \
+-XX:GCLogFileSize=10M"
+ENTRYPOINT java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom -jar /app.jar
