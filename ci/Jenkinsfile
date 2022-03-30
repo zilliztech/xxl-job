@@ -13,7 +13,7 @@ pipeline {
    }
    agent {
         kubernetes {
-            label 'ci'
+            label 'cloud-billing-ci'
             inheritFrom 'default'
             defaultContainer 'main'
             yamlFile 'ci/pod/ci.yaml'
