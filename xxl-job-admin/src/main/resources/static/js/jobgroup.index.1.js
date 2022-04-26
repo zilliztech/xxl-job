@@ -1,4 +1,9 @@
+// table data
+let tableData = {};
+
 $(function() {
+    // 导入接口地址
+	importApiUrl = "/jobgroup/save";
 
 	// init date tables
 	var jobGroupTable = $("#jobgroup_list").dataTable({
@@ -21,6 +26,13 @@ $(function() {
 		"ordering": false,
 		//"scrollX": true,	// scroll x，close self-adaption
 		"columns": [
+			{
+        		"data": 'id',
+        		"visible" : true,
+        		"render": function ( data, type, row ) {
+        			return '<input type ="checkbox" name="dataCheckTag" value="'+data+'">';
+        		}
+        	},
 			{
 				"data": 'id',
 				"visible" : false
@@ -107,11 +119,14 @@ $(function() {
 				"sSortAscending" : I18n.dataTable_sSortAscending ,
 				"sSortDescending" : I18n.dataTable_sSortDescending
 			}
+		},
+		"fnDrawCallback": function(){
+			initWebExportImport();
 		}
 	});
 
-	// table data
-	var tableData = {};
+	// 赋值当前页表格对象
+	dataTableObj = jobGroupTable;
 
 	// search btn
 	$('#searchBtn').on('click', function(){

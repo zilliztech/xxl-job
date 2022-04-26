@@ -1,4 +1,9 @@
+let tableData = {};
+
 $(function() {
+
+	// 导入接口地址
+	importApiUrl = "/jobinfo/add";
 
 	// init date tables
 	var jobTable = $("#job_list").dataTable({
@@ -24,6 +29,13 @@ $(function() {
 	    "ordering": false,
 	    //"scrollX": true,	// scroll x，close self-adaption
 	    "columns": [
+					{
+						"data": 'id',
+						"visible" : true,
+						"render": function ( data, type, row ) {
+							return '<input type ="checkbox" name="dataCheckTag" value="'+data+'">';
+						}
+					},
 	                {
 	                	"data": 'id',
 						"bSortable": false,
@@ -187,11 +199,15 @@ $(function() {
 				"sSortAscending" : I18n.dataTable_sSortAscending ,
 				"sSortDescending" : I18n.dataTable_sSortDescending
 			}
+		},
+		"fnDrawCallback": function(){
+			initWebExportImport();
 		}
 	});
 
-    // table data
-    var tableData = {};
+
+	// 赋值当前页表格对象
+	dataTableObj = jobTable;
 
 	// search btn
 	$('#searchBtn').on('click', function(){
