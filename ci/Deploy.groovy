@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def app_name='xxl-job'
+def app_name='xxl-job-admin'
 def devops_cd_git="github.com/zilliztech/vdc-deploy.git"
 pipeline {
    options{
