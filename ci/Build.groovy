@@ -3,7 +3,7 @@
 def gitShortCommit=''
 def date=''
 def image_tag=''
-def app_name='xxl-job'
+def app_name='xxl-job-admin'
 def github='https://github.com/zilliztech/xxl-job.git'
 
 pipeline {
