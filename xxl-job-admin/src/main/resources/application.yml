@@ -32,8 +32,8 @@ spring:
 
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://cloud-db-dev-instance-1.crg0blv4wtju.ap-southeast-1.rds.amazonaws.com:3306/scheduler?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=UTC
-    username: scheduler
-    password: 8E22635DE801665
+    username: <username>
+    password: <password>
 
   freemarker:
     charset: UTF-8
