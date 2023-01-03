@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: jenkins
+spec:
+  containers:
+    - name: main
+      image: harbor-us-vdc.zilliz.cc/devops/cd-base:20220316-a7c2c5e
+      args: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: maven-settings
+          mountPath: /apps/.m2/
+    - name: kaniko
+      imagePullPolicy: IfNotPresent
+      image: harbor-us-vdc.zilliz.cc/devops/kaniko-executor:v1.8.0-debug
+      command:
+        - /busybox/cat
+      tty: true
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker/
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret-us
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+    - name: maven-settings
+      configMap:
+        name: maven-settings
